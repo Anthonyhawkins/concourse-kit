@@ -1,10 +1,17 @@
 from yamlmaker import env
 import os
-pipeline_suffix = "operations"
 
+concouse_target = "concourse"
+pipeline_suffix = "operations"
 pipeline_environments = [
   "dev",
   "stage",
+]
+
+fly_options = [
+  "non-interactive",
+  "unpause-pipeline",
+  "hide-pipeline"
 ]
 
 def pipeline_config():

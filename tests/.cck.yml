@@ -1,0 +1,24 @@
+
+# The default concourse target to use
+concourse_target: concourse
+
+# These options are allowed.
+# fly_default_options:
+# - non-interactive | interactive
+# - hide-pipeline | expose-pipeline
+# - unpause-pipeline | pause-pipeline
+
+# When Setting a Pipeline Fly will use these options
+fly_default_options:
+- interactive
+- hide-pipeline
+- unpause-pipeline
+
+# The directory to import <pipeline_name>.py files from. 
+pipelines_dir: pipelines
+
+# The directory to look for <pipeline_name>_test.py files from.
+pipelines_test_dir: pipeline_tests
+
+# The directory to use for target-environments
+target_environments_dir: target_environments

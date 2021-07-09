@@ -124,7 +124,7 @@ jobs:
         path: echo
         args: ["Hello world!"]
 ```
-To configure this pipeline using cck a new `pipelines/hello_world.py` file would be created and contain the following.  It **must** have a top-level function defined as `pipeline_config` which returns a `dict` or `list`.
+To configure this pipeline using cck, a new `pipelines/hello_world.py` file would need to be created and contain the following.  It **must** have a top-level function defined as `pipeline_config` which returns a `dict`.
 
 ```python
 def pipeline_config():
