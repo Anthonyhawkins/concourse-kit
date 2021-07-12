@@ -6,6 +6,8 @@ import os
 import subprocess
 import pytest
 import yaml
+import traceback
+
 
 from yamlmaker import Text
 from yamlmaker import generate
@@ -140,7 +142,15 @@ def generate_pipeline(name, environments, cck_config, plan_flag, pipeline=None):
     importlib.reload(pipeline)
 
   try:
-    config = pipeline.pipeline_config()
+    try:
+      pass
+      config = pipeline.pipeline_config()
+    except Exception as e:
+      exc_type, exc_value, exc_tb = sys.exc_info()
+      error = traceback.format_exception(exc_type, exc_value, exc_tb)[-2]
+      print(Text.red(f"ENVIRONMENT: {environment}"))
+      print(Text.red(error))
+      panic(f"Pipeline: {pipelines_dir}/{name}.py Encountered an Python Exception", e)
     if type(config) is not dict: 
       panic(f"Pipeline: {pipelines_dir}/{name}.py pipeline_config() MUST return a dictionary.")
     generate(pipeline.pipeline_config(), name)
@@ -198,7 +208,7 @@ def set_pipeline(name, environments, all_flag, cck_config, plan_flag):
   pipeline_suffix = get_pipeline_suffix(pipeline)
   allowed_environments = determine_pipeline_environments(pipeline, name, environments, pipelines_dir, target_environments_dir)
   concourse_target = determine_concourse_target(pipeline, cck_config["concourse_target"])
-
+  origin_name = name
   name = name.replace("_", "-").lower()
   if pipeline_suffix: name = f"{name}-{pipeline_suffix}"
   
@@ -230,35 +240,35 @@ def set_pipeline(name, environments, all_flag, cck_config, plan_flag):
 
       fly_options_string = " ".join(fly_options)
 
-      output = subprocess.call(['fly', 'validate-pipeline', '--config', f"{pipeline_name}.yml"])
-      if output == 0:
+      output = fly_run(['fly', 'validate-pipeline', '--config', f"{pipeline_name}.yml"], stdout=subprocess.DEVNULL)
+      if output.returncode == 0:
         valid = Text.green("valid")
         arrow = ""
       else:
         valid = Text.red("invalid")
         arrow = Text.red("└───> ")
 
-      print(f"{arrow}{pipelines_dir}/{name}.py | {pipeline_name} | {concourse_target} | {fly_options_string} | {valid}")
+      print(f"{arrow}{pipelines_dir}/{origin_name}.py | {pipeline_name} | {concourse_target} | {fly_options_string} | {valid}")
 
     else:
       
       set_command = ['fly', '-t', concourse_target, 'set-pipeline', '--pipeline', pipeline_name , '--config', f"{pipeline_name}.yml"]
       if "non-interactive" in fly_options: set_command.append("--non-interactive")    
-      subprocess.run(set_command)
+      fly_run(set_command)
       
       # Visibility and Pause State
       if "expose-pipeline" in fly_options:
         expose_command = ['fly', '-t', concourse_target, 'expose-pipeline', '--pipeline', pipeline_name]
-        subprocess.run(expose_command)
+        fly_run(expose_command)
       if "hide-pipeline" in fly_options:
         hide_command = ['fly', '-t', concourse_target, 'hide-pipeline', '--pipeline', pipeline_name]
-        subprocess.run(hide_command)
+        fly_run(hide_command)
       if "unpause-pipeline" in fly_options:
         unpause_command = ['fly', '-t', concourse_target, 'unpause-pipeline', '--pipeline', pipeline_name]
-        subprocess.run(unpause_command)
+        fly_run(unpause_command)
       if "pause-pipeline" in fly_options:
         pause_command = ['fly', '-t', concourse_target, 'pause-pipeline', '--pipeline', pipeline_name]
-        subprocess.run(pause_command)
+        fly_run(pause_command)
 
     os.remove(f"{pipeline_name}.yml")
 
@@ -283,10 +293,8 @@ def determine_concourse_target(pipeline, default_target):
   """
   try:
     concourse_target = pipeline.concourse_target
-    print(concourse_target)
     if not type(concourse_target) == str: return default_target
   except AttributeError:
-    print("blah")
     return default_target
   return concourse_target
 
@@ -356,6 +364,15 @@ def determine_fly_options(pipeline, default_options):
         pipeline_options.append(option)
 
   return list(set(pipeline_options))
+
+def fly_run(command, **kwargs):
+  """
+  Run the fly command.
+  """
+  try:
+    return subprocess.run(command, **kwargs)
+  except FileNotFoundError:
+    panic("Unable to Execute Fly Command. Is it Installed?")
 
 if __name__ == "__main__":
   main()

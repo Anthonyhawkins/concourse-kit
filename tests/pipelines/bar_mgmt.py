@@ -10,8 +10,8 @@ pipeline_environments = [
 
 fly_options = [
   "non-interactive",
-  "unpause-pipeline",
-  "hide-pipeline"
+  "pause-pipeline",
+  "expose-pipeline"
 ]
 
 def pipeline_config():

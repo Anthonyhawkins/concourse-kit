@@ -1,28 +1,24 @@
 from yamlmaker import env
 from yamlmaker import Include
 
-
-concourse_target = "main"
-
+concourse_target = "concourse"
 pipeline_suffix = "install"
-
 pipeline_environments = [
   "dev",
   "stage",
   "prod"
 ]
-
 fly_options = [
   "non-interactive",
-  "expose-pipeline",
-  "pause-pipeline"
+  "unpause-pipeline",
+  "hide-pipeline"
 ]
 
 def pipeline_config():
   return {
       "jobs": [
           {
-            "cookies": "foo-job-" + env("ENVIRONMENT"),
+            "name": "foo-job-" + env("ENVIRONMENT"),
             "plan": [
               {
                 "task": "foo-task",
