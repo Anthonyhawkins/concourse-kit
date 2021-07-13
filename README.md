@@ -1,3 +1,4 @@
+![alt text](assets/cck-logo.jpg "Concourse Kit")
 # Concourse Kit - For Extreme Pipelining
 Concourse Kit is a highly opinionated approach to developing, generating, testing, validating, and setting, multiple, domain-specific, concourse pipelines within a single mono-repo.
 
@@ -201,7 +202,7 @@ def pipeline_config():
 ```
 To Generate the pipeline the following is run.  Even though the environment isn't used in this example, the generate command still requires it.
 ```bash
-> python cck --generate-pipeline --name hello_world --env dev
+> cck --generate-pipeline --name hello_world --env dev
 Generating Pipeline to hello_world.yml
 ```
 This will generate the same yaml as shown above.
@@ -279,7 +280,7 @@ def pipeline_config():
 ```
 Generate the pipeline.yml
 ```bash
-> python cck --generate-pipeline --name hello_world --env dev
+> cck --generate-pipeline --name hello_world --env dev
 Generating Pipeline to hello_world.yml
 ```
 Our generated config now looks like this, as you can see the dev specific variable is used.
@@ -318,7 +319,7 @@ You can target a different team if you'd like, for this example it will just use
 ### Setting the Pipeline
 When a pipeline is set, it will be generated and immediately set.  The name of the pipeline is the same as the `pipeline.py` file with underscores replaced with dashes.  In addition, the `target-environment` is prefixed to the name.
 ```
-> python cck --set-pipeline --name hello_world --env dev
+> cck --set-pipeline --name hello_world --env dev
 Generating Pipeline to dev-hello-world.yml
 Setting pipeline: dev-hello-world
 jobs:
@@ -347,7 +348,7 @@ Specifying the `--all` flag when using the `--set-pipeline` command will attempt
 For this to work, every `target-environment` must have all the same var yaml files, content files etc. otherwise the pipeline will work for some environments, not others.  
 
 ```
-> python cck --set-pipeline --name hello_world --all
+> cck --set-pipeline --name hello_world --all
 Generating Pipeline to dev-hello-world.yml
 Setting pipeline: dev-hello-world
 jobs:
@@ -452,7 +453,7 @@ def pipeline_config():
 ```
 When you run `cck` with the `--all` flag again, it will only set the pipeline for the environments declared within the `pipeline_environments` list.
 ```
-> python cck --set-pipeline --name hello_world --all
+> cck --set-pipeline --name hello_world --all
 Generating Pipeline to dev-hello-world.yml
 Setting pipeline: dev-hello-world
 no changes to apply
@@ -498,7 +499,7 @@ def pipeline_config():
 ```
 
 ```
-> python cck --set-pipeline --name hello_world --env dev
+> cck --set-pipeline --name hello_world --env dev
 ```
 
 ```
@@ -571,7 +572,7 @@ and `bar_mgmt` is scoped to `dev` and `stage`, `foo_mgmt` is scoped to `dev`, `s
 
 Running the following command will set all pipelines for the environments they are scoped to.  `cck` will give you a 10 second window to abort the command if you ran it by mistake.
 ```
-> python cck --set-pipeline --all
+> cck --set-pipeline --all
 ```
 ```
 Setting all pipelines in 10 seconds... ctl+c to cancel.
@@ -616,7 +617,7 @@ Running the following command will display a plan for a single pipeline and envi
 ```
 ![alt text](assets/cck-plan-2.jpg "Planning a Single Pipeline and All Target Environments")
 ### Planning All Pipelines and All Target Environments
-Below is an example of an invalid configuration and also shows the various colors!.
+Below is an example of an invalid configuration and also shows the various colors!
 ```
 > cck --set-pipeline --all --plan
 ```
@@ -716,7 +717,7 @@ def test_prod_has_one_job():
 ```
 Running the test.
 ```
-> python cck --test-pipeline --name foo_mgmt
+> cck --test-pipeline --name foo_mgmt
 ```
 ```
 Testing Pipeline: foo_mgmt
