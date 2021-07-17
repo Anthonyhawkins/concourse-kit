@@ -1,6 +1,6 @@
 import os
-from concoursekit.concoursekit import generate_pipeline
-from concoursekit.concoursekit import load_config
+from concoursekit import generate_pipeline
+from concoursekit import load_config
 
 def test_generate_pipeline_with_env(capsys):
   cck_config = load_config()

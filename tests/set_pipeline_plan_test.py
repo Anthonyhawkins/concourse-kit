@@ -4,8 +4,8 @@ from unittest.mock import patch
 import pytest
 import sys
 import os
-from concoursekit.concoursekit import set_pipeline
-from concoursekit.concoursekit import load_config
+from concoursekit import set_pipeline
+from concoursekit import load_config
 
 
 class ReturnCode(object):
@@ -13,7 +13,7 @@ class ReturnCode(object):
     self.returncode = returncode
 
 
-@patch("concoursekit.concoursekit.fly_run")
+@patch("concoursekit.fly_run")
 def test_valid_pipeline(mock_fly_run, capsys):
   cck_config = load_config()
 
@@ -37,7 +37,7 @@ def test_valid_pipeline(mock_fly_run, capsys):
     mock.call(['fly', 'validate-pipeline', '--config', 'dev-foo-mgmt-install.yml'], stdout=-3),
   ])
 
-@patch("concoursekit.concoursekit.fly_run")
+@patch("concoursekit.fly_run")
 def test_valid_pipeline(mock_fly_run, capsys):
   cck_config = load_config()
 

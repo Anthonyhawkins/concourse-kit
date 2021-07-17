@@ -4,11 +4,11 @@ from unittest.mock import patch
 import pytest
 import sys
 import os
-from concoursekit.concoursekit import set_pipelines
-from concoursekit.concoursekit import load_config
+from concoursekit import set_pipelines
+from concoursekit import load_config
 
 
-@patch("concoursekit.concoursekit.fly_run")
+@patch("concoursekit.fly_run")
 def test_set_pipelines_with_one_env(mock_fly_run):
   cck_config = load_config()
 
@@ -31,7 +31,7 @@ def test_set_pipelines_with_one_env(mock_fly_run):
     mock.call(['fly', '-t', 'concourse', 'unpause-pipeline', '--pipeline', 'dev-foo-mgmt-install'])
   ], any_order=True)
 
-@patch("concoursekit.concoursekit.fly_run")
+@patch("concoursekit.fly_run")
 def test_set_pipelines_with_two_env(mock_fly_run):
   cck_config = load_config()
 
@@ -63,7 +63,7 @@ def test_set_pipelines_with_two_env(mock_fly_run):
   mock.call(['fly', '-t', 'concourse', 'unpause-pipeline', '--pipeline', 'stage-foo-mgmt-install'])
   ], any_order=True)
 
-@patch("concoursekit.concoursekit.fly_run")
+@patch("concoursekit.fly_run")
 def test_set_pipelines_without_envs(mock_fly_run):
   cck_config = load_config()
 

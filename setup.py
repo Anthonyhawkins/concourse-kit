@@ -4,11 +4,10 @@ setup(
     name="concoursekit",
     author="Anthony Hawkins",
     author_email="ahawkins.mail@gmail.com",
-    version="0.0.7",
+    version="0.0.8",
     description="A Concourse CI Pipeline Generator Utility.",
     keywords=["concourse", "yaml generator", "pipeline manager", "ci", "cd"],
     license="MIT",
-    package_dir={'': 'concoursekit'},
     packages=find_packages(),
     include_package_data=True,
     python_requires=">=3.9",
@@ -18,7 +17,7 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        cck=concoursekit.concoursekit:main
+        cck=concoursekit:main
     ''',
     classifiers=[
         "Topic :: Software Development :: Code Generators",
