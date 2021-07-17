@@ -21,6 +21,7 @@ jobs:
 
       - name: Test with PyTest
         run: |
+          cd tests
           pip install pytest
           export PYTHONPATH=$(pwd)
           pytest -rA
