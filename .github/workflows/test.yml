@@ -20,6 +20,6 @@ jobs:
     - name: Test with pytest
       run: |
         pip install pytest
+        pip install -e .
         cd tests
-        echo $(pwd)
-        pytest -rA
+        pytest -rA -v

@@ -22,10 +22,9 @@ jobs:
       - name: Test with PyTest
         run: |
           pip install pytest
+          pip install -e .
           cd tests
-          echo $(pwd)
-          pytest -rA
-
+          pytest -rA -v
       - name: Build package
         run: >-
           python -m

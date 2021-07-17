@@ -29,7 +29,7 @@ def test_set_pipelines_with_one_env(mock_fly_run):
     mock.call(['fly', '-t', 'concourse', 'set-pipeline', '--pipeline', 'dev-foo-mgmt-install', '--config', 'dev-foo-mgmt-install.yml', '--non-interactive']),
     mock.call(['fly', '-t', 'concourse', 'hide-pipeline', '--pipeline', 'dev-foo-mgmt-install']),
     mock.call(['fly', '-t', 'concourse', 'unpause-pipeline', '--pipeline', 'dev-foo-mgmt-install'])
-  ])
+  ], any_order=True)
 
 @patch("concoursekit.concoursekit.fly_run")
 def test_set_pipelines_with_two_env(mock_fly_run):
