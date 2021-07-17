@@ -4,7 +4,7 @@ setup(
     name="concoursekit",
     author="Anthony Hawkins",
     author_email="ahawkins.mail@gmail.com",
-    version="0.0.8",
+    version="0.0.9",
     description="A Concourse CI Pipeline Generator Utility.",
     keywords=["concourse", "yaml generator", "pipeline manager", "ci", "cd"],
     license="MIT",
@@ -14,6 +14,8 @@ setup(
     install_requires=[
         "pytoml",
         "yamlmaker",
+        "pytest",
+        "pyyaml"
     ],
     entry_points='''
         [console_scripts]

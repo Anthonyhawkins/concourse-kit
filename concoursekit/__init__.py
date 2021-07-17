@@ -4,9 +4,10 @@ import time
 import sys
 import os
 import subprocess
+import traceback
+
 import pytest
 import yaml
-import traceback
 
 from yamlmaker import Text
 from yamlmaker import generate
