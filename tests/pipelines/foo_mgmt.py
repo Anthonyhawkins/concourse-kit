@@ -1,7 +1,6 @@
 from yamlmaker import env
 from yamlmaker import Include
 
-concourse_target = "concourse"
 pipeline_suffix = "install"
 pipeline_environments = [
   "dev",

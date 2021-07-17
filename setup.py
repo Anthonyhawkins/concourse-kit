@@ -6,14 +6,14 @@ setup(
     author_email="ahawkins.mail@gmail.com",
     version="0.0.1",
     description="A Concourse CI Pipeline Generator Utility.",
-    keywords=["concourse", "yaml generator"],
+    keywords=["concourse", "yaml generator", "pipeline manager", "ci", "cd"],
     license="MIT",
     packages=find_packages(),
     include_package_data=True,
     python_requires=">=3.9",
     install_requires=[
         "pytoml",
-        "pyyaml",
+        "yamlmaker",
     ],
     entry_points='''
         [console_scripts]

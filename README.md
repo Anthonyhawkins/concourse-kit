@@ -26,7 +26,7 @@ Concourse Kit Specifies the following Conventions to be followed.
 
 ## Requirements
 To getup and running with Concourse Kit, you will need the following.
-* **Python 3.9:** You will need Python 3.9+ installed as this approach makes use of the union operator for dictionaries.
+* **Python 3.9:** You will need Python 3.9+ installed as this cck makes use of the union operator for dictionaries.
 * **fly CLI:** You will need the fly CLI installed as concourse kit invokes it to validate, and set pipelines for you.
 * **An Open Mind:** Yes, this is a very unconventional approach to developing and managing pipelines but it might just be crazy enough to work.
 
@@ -737,7 +737,7 @@ PASSED pipeline_tests/foo_mgmt_test.py::test_prod_has_one_job
 ### Testing all Pipelines
 If you want to verify all pipelines are passing their tests, simply run the following
 ```
-> python .\cck --test-pipeline --all
+> cck --test-pipeline --all
 ```
 ```
 Testing All Pipelines

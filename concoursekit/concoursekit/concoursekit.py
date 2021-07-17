@@ -8,16 +8,9 @@ import pytest
 import yaml
 import traceback
 
-
 from yamlmaker import Text
 from yamlmaker import generate
 from yamlmaker import panic
-# DONE - cc_kit.py --set-pipeline --name <pipeline_name> --env <env>
-# DONE - cc_kit.py --set-pipeline --name <pipeline_name> --all
-# DONE - cc_kit.py --set-pipeline --all
-# DONE - cc_kit.py --gen-pipeline --name <pipeline_name> --env <env>
-# DONE - cc_kit.py --test-pipeline --name <pipeline_name>
-# DONE - cc_kit.py --test-pipeline --all
 
 CCK_DEFAULTS = """
 # The default concourse target to use
@@ -57,12 +50,25 @@ def setup():
   commands.add_argument("--generate-pipeline", action="store_true", dest="gen_pipeline", help="generate a pipeline.yml config")
   commands.add_argument("--test-pipeline", action="store_true", dest="test_pipeline", help="run the test for one or more pipelines")
   commands.add_argument("--set-pipeline", action="store_true", dest="set_pipeline", help="set pipeline(s)")
-  
-  parser.add_argument("--plan", action="store_true", dest="plan", default=False, help="View the plan only, don't set anything.")
+
+  parser.add_argument("--plan", action="store_true", dest="plan_flag", default=False, help="View the plan only, don't set anything.")
   parser.add_argument("--all", action="store_true", dest="all_flag", help="Specify all pipelines or all environments, depending on context.")
   parser.add_argument("--env", action="append", dest="environments", default=[], help="the name of a target environment; specify multiple times for multiple environments.")
   parser.add_argument("--name", action="store", dest="name", help="the name of the pipeline.py file")
 
+  parsed_args = parser.parse_args()
+
+  one_of_commands = [
+    parsed_args.init,
+    parsed_args.gen_pipeline,
+    parsed_args.test_pipeline,
+    parsed_args.set_pipeline
+  ]
+
+  if not True in one_of_commands:
+    parser.print_usage()
+    panic('You Must Specify a Top-Level command: --init | --generate-pipeline | --test-pipeline | --set-pipeline')
+    
   return  parser.parse_args()
 
 
@@ -71,25 +77,51 @@ def main():
   Dispatch to the respective functions.
   """
   sys.path.append(os.getcwd())
-
   parsed_args = setup()
-  if os.path.exists(".cck.yml"):
 
-    with open(".cck.yml") as stream:
-      try:
-        cck_config = yaml.safe_load(stream)
-      except yaml.YAMLError:
-        panic("YAML Load Failure for .cck.yml")
-    if parsed_args.gen_pipeline: generate_pipeline(parsed_args.name, parsed_args.environments, cck_config, parsed_args.plan)
+  if os.path.exists(".cck.yml"):
+    cck_config = load_config()
+    if parsed_args.gen_pipeline: generate_pipeline(parsed_args.name, parsed_args.environments, cck_config, parsed_args.plan_flag)
     if parsed_args.test_pipeline: test_pipeline(parsed_args.name, parsed_args.all_flag, cck_config)
-    if parsed_args.set_pipeline and parsed_args.name: set_pipeline(parsed_args.name, parsed_args.environments, parsed_args.all_flag, cck_config, parsed_args.plan)
-    if parsed_args.set_pipeline and not parsed_args.name: set_pipelines(parsed_args.environments, parsed_args.all_flag, cck_config, parsed_args.plan)
+    if parsed_args.set_pipeline and parsed_args.name: set_pipeline(parsed_args.name, parsed_args.environments, parsed_args.all_flag, cck_config, parsed_args.plan_flag)
+    if parsed_args.set_pipeline and not parsed_args.name: set_pipelines(parsed_args.environments, parsed_args.all_flag, cck_config, parsed_args.plan_flag)
   else:
     if parsed_args.init: 
       initialize_cck()
     else:
       panic("You are not in a concourse-kit managed directory.  You can run cck --init to create one.")
 
+
+def load_config():
+  """
+  Load the .cck.yml file, validate a proper config, and ensure required directories exists.
+  """
+  with open(".cck.yml") as stream:
+    try:
+      cck_config = yaml.safe_load(stream)
+    except yaml.YAMLError:
+      panic("YAML Load Failure for .cck.yml")
+
+  config_keys = {
+    "concourse_target": str,
+    "fly_default_options": list,
+    "pipelines_dir": str,
+    "pipelines_test_dir": str,
+    "target_environments_dir": str
+  }
+
+  for key, required_type in config_keys.items():
+    if key not in cck_config:
+      panic(f"Invalid Config: Key: {key} - Not Found")
+    else:
+      if not type(cck_config[key]) == required_type:
+        panic(f"Invalid Config: Key: {key} - Is not Type {required_type}")
+
+    if "_dir" in key and not os.path.exists(cck_config[key]):
+      panic("Required Directory: {dir_name} - Does not Exist".format(dir_name=cck_config[key]))
+
+
+  return cck_config
 
 def initialize_cck():
   """
@@ -162,8 +194,6 @@ def test_pipeline(name, all_flag, cck_config):
   """
   Test one or more pipelies using pytest.
   """
-
-  # TODO Run fly validate-pipeline
   if all_flag:
     print(Text.cyan("Testing All Pipelines"))
     pytest.main(["-s", "-k", pipelines_test_dir, "-rA"])
@@ -193,6 +223,7 @@ def set_pipelines(environments, all_flag, cck_config, plan_flag):
   for pipeline in pipelines:
     set_pipeline(pipeline.replace(".py", ""), environments, all_flag, cck_config, plan_flag)
 
+
 def set_pipeline(name, environments, all_flag, cck_config, plan_flag):
   """ 
   Set a single pipeline in one or more environments
@@ -213,7 +244,7 @@ def set_pipeline(name, environments, all_flag, cck_config, plan_flag):
   if pipeline_suffix: name = f"{name}-{pipeline_suffix}"
   
   if plan_flag: 
-    print(Text.bold(f"Pipeline Plan for: {name} - origin | pipeline-name | concourse-target | fly options | Validity"))
+    print(Text.bold(f"Pipeline Plan for: {name} - origin | pipeline-name | concourse-target | fly options | validity"))
 
   for environment in allowed_environments:
     if environment == "common": continue
@@ -222,10 +253,8 @@ def set_pipeline(name, environments, all_flag, cck_config, plan_flag):
     pipeline_name = f"{environment}-{name}"
     
     if not plan_flag: print(Text.green(f"Setting pipeline: {pipeline_name}"))
+
     generate_pipeline(pipeline_name, [environment], cck_config, plan_flag, pipeline)
-
-    # TODO - account for fly not logged in
-
     fly_options = determine_fly_options(pipeline, cck_config["fly_default_options"])
 
     if plan_flag: 
@@ -318,9 +347,11 @@ def determine_pipeline_environments(pipeline, name, environments, pipelines_dir,
   except AttributeError:
     env_directories = [env[0] for env in os.walk(target_environments_dir)]
     env_directories.pop(0) # remove target-environments dir name
-    # TODO - Account for unix forward slash /
-    allowed_environments = [env.split("\\")[-1] for env in env_directories]
 
+    if os.name == 'nt':
+      allowed_environments = [env.split("\\")[-1] for env in env_directories]
+    else:
+      allowed_environments = [env.split("/")[-1] for env in env_directories]
   #
   # reduce the list down to only the environments which were specified
   # using the --env flag(s) (environments) 

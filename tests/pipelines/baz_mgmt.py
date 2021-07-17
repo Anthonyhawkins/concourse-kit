@@ -1,7 +1,10 @@
 from yamlmaker import env
 
 concourse_target = "my-team"
-
+fly_options = [
+  "non-interactive",
+  "pause-pipeline"
+]
 def pipeline_config():
   return {
       "jobs": [

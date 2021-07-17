@@ -21,4 +21,4 @@ pipelines_dir: pipelines
 pipelines_test_dir: pipeline_tests
 
 # The directory to use for target-environments
-target_environments_dir: target_environments
+target_environments_dir: target-environments
