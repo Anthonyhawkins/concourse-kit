@@ -25,6 +25,7 @@ jobs:
           pip install -e .
           cd tests
           pytest -rA -v
+          cd ..
       - name: Build package
         run: >-
           python -m
