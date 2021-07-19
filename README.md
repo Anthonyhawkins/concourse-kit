@@ -343,7 +343,7 @@ jobs:
 apply configuration? [yN]: 
 ```
 ### Setting a Pipeline for Multiple Environments.
-Specifying the `--all` flag when using the `--set-pipeline` command will attempt to set the pipeline for all environments, except for `common`.
+Specifying the `--all` flag when using the `--set-pipeline` command will attempt to set the pipeline for all environments, except for defined within the `.cck.yml` under `ignore_environments: []`.  By default, the `common` environment has been added for you. 
 
 For this to work, every `target-environment` must have all the same var yaml files, content files etc. otherwise the pipeline will work for some environments, not others.  
 

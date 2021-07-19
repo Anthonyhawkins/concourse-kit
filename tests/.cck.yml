@@ -22,3 +22,8 @@ pipelines_test_dir: pipeline_tests
 
 # The directory to use for target-environments
 target_environments_dir: target-environments
+
+# Environments to ignore when setting pipelines
+ignore_environments:
+- common
+- trusted-CAs
