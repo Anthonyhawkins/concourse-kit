@@ -5,7 +5,8 @@ pipeline_suffix = "install"
 pipeline_environments = [
   "dev",
   "stage",
-  "prod"
+  "prod",
+  "sandbox"
 ]
 fly_options = [
   "non-interactive",

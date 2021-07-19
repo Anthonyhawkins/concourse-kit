@@ -68,7 +68,7 @@ def test_set_pipelines_without_envs(mock_fly_run):
   cck_config = load_config()
 
   set_pipelines( 
-    environments=[], 
+    environments=["!sandbox"], 
     all_flag=True, 
     cck_config=cck_config, 
     plan_flag=False

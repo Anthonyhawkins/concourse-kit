@@ -403,6 +403,14 @@ apply configuration? [yN]: y
 pipeline created!
 ```
 
+### Setting for All Environments, Except One or More Environments
+Sometimes you may wish to set all environments, except one or more of them.  To accomplish this, you can negate specific environments by appending the target-environment name with a bang `!`.  
+```
+> cck --set-pipeline --name hello_world --all  --env !sandbox
+```
+This will set for all environments, except the sandbox environment.
+
+
 ### Scoping a Pipeline to Specific Environments.
 It's rare that you will have a pipeline which needs to target *every* environment, however, it is fairly common that pipelines will need to target multiple *specific* environments.
 
