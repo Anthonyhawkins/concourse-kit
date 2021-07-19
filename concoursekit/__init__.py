@@ -36,6 +36,10 @@ pipelines_test_dir: pipeline_tests
 
 # The directory to use for target-environments
 target_environments_dir: target_environments
+
+# Environments to ignore when setting pipelines
+ignore_environments:
+- common
 """
 
 
@@ -108,7 +112,8 @@ def load_config():
     "fly_default_options": list,
     "pipelines_dir": str,
     "pipelines_test_dir": str,
-    "target_environments_dir": str
+    "target_environments_dir": str,
+    "ignore_environments": list
   }
 
   for key, required_type in config_keys.items():
@@ -232,13 +237,14 @@ def set_pipeline(name, environments, all_flag, cck_config, plan_flag):
 
   target_environments_dir = cck_config["target_environments_dir"]
   pipelines_dir = cck_config["pipelines_dir"]
+  ignore_environments = cck_config["ignore_environments"]
 
   # must always set the ENVIRONMENT variable before import
   # import once, now to pull in pipeline_suffix, pipeline_environments etc.
   pipeline = import_pipeline(name, cck_config["pipelines_dir"])
 
   pipeline_suffix = get_pipeline_suffix(pipeline)
-  allowed_environments = determine_pipeline_environments(pipeline, name, environments, pipelines_dir, target_environments_dir)
+  allowed_environments = determine_pipeline_environments(pipeline, name, environments, pipelines_dir, target_environments_dir, ignore_environments)
   concourse_target = determine_concourse_target(pipeline, cck_config["concourse_target"])
   origin_name = name
   name = name.replace("_", "-").lower()
@@ -248,7 +254,6 @@ def set_pipeline(name, environments, all_flag, cck_config, plan_flag):
     print(Text.bold(f"Pipeline Plan for: {name} - origin | pipeline-name | concourse-target | fly options | validity"))
 
   for environment in allowed_environments:
-    if environment == "common": continue
 
     os.environ["ENVIRONMENT"] = environment
     pipeline_name = f"{environment}-{name}"
@@ -329,7 +334,7 @@ def determine_concourse_target(pipeline, default_target):
   return concourse_target
 
 
-def determine_pipeline_environments(pipeline, name, environments, pipelines_dir, target_environments_dir):
+def determine_pipeline_environments(pipeline, name, environments, pipelines_dir, target_environments_dir, ignore_environments):
   """
   Determine which environments a pipeline should be generated for.
   """
@@ -378,8 +383,11 @@ def determine_pipeline_environments(pipeline, name, environments, pipelines_dir,
     #
     if intersect: allowed_environments = list(set(environments).intersection(allowed_environments))
 
+  negated_environments += ignore_environments
   for negated_environment in negated_environments:
-    allowed_environments.remove(negated_environment.replace("!", ""))
+    negated_environment = negated_environment.replace("!", "")
+    if negated_environment in allowed_environments:
+      allowed_environments.remove(negated_environment)
   return allowed_environments
 
 
