@@ -357,12 +357,29 @@ def determine_pipeline_environments(pipeline, name, environments, pipelines_dir,
   # reduce the list down to only the environments which were specified
   # using the --env flag(s) (environments) 
   # 
+  negated_environments = []
+  intersect = False
   if environments:
     for environment in environments:
+
+      #
+      # If an environment begins with a bang omit it from the list.
+      #
+      if environment.startswith("!"):
+        negated_environments.append(environment)
+        continue
+      intersect = True
+
       if environment not in allowed_environments:
         print(Text.yellow(f"Warning - environment {environment} does not exist within the {target_environments_dir} directory and will be ignored."))
-    allowed_environments = list(set(environments).intersection(allowed_environments))
 
+    #
+    # We only want to intersect if a non-negated environment was found.  
+    #
+    if intersect: allowed_environments = list(set(environments).intersection(allowed_environments))
+
+  for negated_environment in negated_environments:
+    allowed_environments.remove(negated_environment.replace("!", ""))
   return allowed_environments
 
 
