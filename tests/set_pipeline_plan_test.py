@@ -28,7 +28,7 @@ def test_valid_pipeline(mock_fly_run, capsys):
   )
 
   out, err = capsys.readouterr()
-  assert "Pipeline Plan for: foo-mgmt-install - origin | pipeline-name | concourse-target | fly options | validity" in out
+  assert "Pipeline Plan for: foo-mgmt - origin | pipeline-name | concourse-target | fly options | validity" in out
 
   for field in ["dev-foo-mgmt-install", "concourse", "non-interactive", "hide-pipeline", "unpause-pipeline", "valid"]:
     assert field in out
@@ -38,7 +38,7 @@ def test_valid_pipeline(mock_fly_run, capsys):
   ])
 
 @patch("concoursekit.fly_run")
-def test_valid_pipeline(mock_fly_run, capsys):
+def test_invalid_pipeline(mock_fly_run, capsys):
   cck_config = load_config()
 
   mock_fly_run.return_value = ReturnCode(1)
@@ -52,11 +52,11 @@ def test_valid_pipeline(mock_fly_run, capsys):
   )
 
   out, err = capsys.readouterr()
-  assert "Pipeline Plan for: foo-mgmt-install - origin | pipeline-name | concourse-target | fly options | validity" in out
+  assert "Pipeline Plan for: foo-mgmt - origin | pipeline-name | concourse-target | fly options | validity" in out
 
   for field in ["dev-foo-mgmt-install", "concourse", "non-interactive", "hide-pipeline", "unpause-pipeline", "invalid"]:
     assert field in out
 
   mock_fly_run.assert_has_calls([
     mock.call(['fly', 'validate-pipeline', '--config', 'dev-foo-mgmt-install.yml'], stdout=-3),
-  ])
+  ], any_order=True)
