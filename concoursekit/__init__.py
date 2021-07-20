@@ -360,32 +360,43 @@ def determine_pipeline_environments(pipeline, name, environments, pipelines_dir,
   # reduce the list down to only the environments which were specified
   # using the --env flag(s) (environments) 
   # 
-  negated_environments = []
-  intersect = False
-  if environments:
-    for environment in environments:
 
-      #
-      # If an environment begins with a bang omit it from the list.
-      #
-      if environment.startswith("!"):
-        negated_environments.append(environment)
-        continue
-      intersect = True
-
-      if environment not in allowed_environments:
-        print(Text.yellow(f"Warning - environment {environment} does not exist within the {target_environments_dir} directory and will be ignored."))
+  negated_environments = []   # environments to remove, start with !<env> or within ignore_environments
+  explicit_environments = []  # environments to reduce down to, passed with --env arg. 
+  for environment in list(environments):
 
     #
-    # We only want to intersect if a non-negated environment was found.  
+    # If an environment begins with a bang it will be negated.
     #
-    if intersect: allowed_environments = list(set(environments).intersection(allowed_environments))
+    if environment.startswith("!"):
+      negated_environments.append(environment.replace("!", ""))
+      continue
+
+    #
+    # If an environment is allowed, it will be reduced to it
+    # 
+    if environment not in allowed_environments:
+      print(Text.yellow(f"Warning - environment {environment} does not exist within the {target_environments_dir} directory and will be ignored."))
+    else:
+      explicit_environments.append(environment)
+
 
   negated_environments += ignore_environments
+  allowed_environments = list(set(allowed_environments))
+  
+  #
+  # Remove environments which are to be negated
+  #
   for negated_environment in negated_environments:
-    negated_environment = negated_environment.replace("!", "")
     if negated_environment in allowed_environments:
       allowed_environments.remove(negated_environment)
+  
+  #
+  # Reduce down to only the environments that were passed via --env and what's allowed. 
+  #
+  if explicit_environments:
+    allowed_environments = list(set(explicit_environments).intersection(allowed_environments))
+
   return allowed_environments
 
 

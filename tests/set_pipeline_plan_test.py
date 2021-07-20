@@ -60,3 +60,22 @@ def test_invalid_pipeline(mock_fly_run, capsys):
   mock_fly_run.assert_has_calls([
     mock.call(['fly', 'validate-pipeline', '--config', 'dev-foo-mgmt-install.yml'], stdout=-3),
   ], any_order=True)
+
+
+@patch("concoursekit.fly_run")
+def test_negated_environment_pipeline(mock_fly_run, capsys):
+  cck_config = load_config()
+
+  mock_fly_run.return_value = ReturnCode(1)
+
+  set_pipeline(
+    name="foo_mgmt", 
+    environments=["!dev"], 
+    all_flag=False, 
+    cck_config=cck_config, 
+    plan_flag=True
+  )
+
+  out, err = capsys.readouterr()
+  assert "Pipeline Plan for: foo-mgmt - origin | pipeline-name | concourse-target | fly options | validity" in out
+  assert "dev-foo-mgmt-install" not in out
