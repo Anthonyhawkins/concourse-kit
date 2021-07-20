@@ -173,11 +173,7 @@ def generate_pipeline(name, environments, cck_config, plan_flag, pipeline=None):
   os.environ["ENVIRONMENT"] = environment
 
   if not plan_flag: print(Text.blue(f"Generating Pipeline to {name}.yml"))
-
-  if not pipeline:
-    pipeline = import_pipeline(name, pipelines_dir)
-  else:
-    importlib.reload(pipeline)
+  if not pipeline: pipeline = import_pipeline(name, pipelines_dir)
 
   try:
     try:
@@ -202,7 +198,7 @@ def test_pipeline(name, all_flag, cck_config):
   """
   if all_flag:
     print(Text.cyan("Testing All Pipelines"))
-    pytest.main(["-s", "-k", pipelines_test_dir, "-rA"])
+    pytest.main(["-s", "-k", cck_config["pipelines_test_dir"], "-rA"])
   else:
     print(Text.cyan(f"Testing Pipeline: {name}"))
     pytest.main(["-s", "-k", name, "-rA"])
@@ -242,22 +238,24 @@ def set_pipeline(name, environments, all_flag, cck_config, plan_flag):
   # must always set the ENVIRONMENT variable before import
   # import once, now to pull in pipeline_suffix, pipeline_environments etc.
   pipeline = import_pipeline(name, cck_config["pipelines_dir"])
-
-  pipeline_suffix = get_pipeline_suffix(pipeline)
   allowed_environments = determine_pipeline_environments(pipeline, name, environments, pipelines_dir, target_environments_dir, ignore_environments)
-  concourse_target = determine_concourse_target(pipeline, cck_config["concourse_target"])
   origin_name = name
   name = name.replace("_", "-").lower()
-  if pipeline_suffix: name = f"{name}-{pipeline_suffix}"
-  
+
   if plan_flag: 
     print(Text.bold(f"Pipeline Plan for: {name} - origin | pipeline-name | concourse-target | fly options | validity"))
 
   for environment in allowed_environments:
-
     os.environ["ENVIRONMENT"] = environment
-    pipeline_name = f"{environment}-{name}"
-    
+    importlib.reload(pipeline)
+    pipeline_suffix = get_pipeline_suffix(pipeline)
+    concourse_target = determine_concourse_target(pipeline, cck_config["concourse_target"])
+      
+    if pipeline_suffix:
+      pipeline_name = f"{environment}-{name}-{pipeline_suffix}"
+    else:
+      pipeline_name = f"{environment}-{name}"
+
     if not plan_flag: print(Text.green(f"Setting pipeline: {pipeline_name}"))
 
     generate_pipeline(pipeline_name, [environment], cck_config, plan_flag, pipeline)

@@ -4,7 +4,7 @@ setup(
     name="concoursekit",
     author="Anthony Hawkins",
     author_email="ahawkins.mail@gmail.com",
-    version="0.1.1",
+    version="0.1.2",
     description="A Concourse CI Pipeline Generator Utility.",
     keywords=["concourse", "yaml generator", "pipeline manager", "ci", "cd"],
     license="MIT",

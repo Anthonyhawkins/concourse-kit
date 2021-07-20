@@ -101,5 +101,6 @@ def test_set_pipelines_without_envs(mock_fly_run):
     mock.call(['fly', '-t', 'concourse', 'unpause-pipeline', '--pipeline', 'stage-foo-mgmt-install']),
     mock.call(['fly', '-t', 'concourse', 'set-pipeline', '--pipeline', 'prod-foo-mgmt-install', '--config', 'prod-foo-mgmt-install.yml', '--non-interactive']),
     mock.call(['fly', '-t', 'concourse', 'hide-pipeline', '--pipeline', 'prod-foo-mgmt-install']),
-    mock.call(['fly', '-t', 'concourse', 'unpause-pipeline', '--pipeline', 'prod-foo-mgmt-install'])
+    mock.call(['fly', '-t', 'concourse', 'unpause-pipeline', '--pipeline', 'prod-foo-mgmt-install']),
+    mock.call(['fly', '-t', 'my-team-stage', 'set-pipeline', '--pipeline', 'stage-zoo-mgmt-install-stage', '--config', 'stage-zoo-mgmt-install-stage.yml']),
   ], any_order=True)
