@@ -242,7 +242,7 @@ def set_pipeline(name, environments, all_flag, cck_config, plan_flag):
   origin_name = name
   name = name.replace("_", "-").lower()
 
-  if plan_flag: 
+  if plan_flag and allowed_environments: 
     print(Text.bold(f"Pipeline Plan for: {name} - origin | pipeline-name | concourse-target | fly options | validity"))
 
   for environment in allowed_environments:
@@ -375,10 +375,12 @@ def determine_pipeline_environments(pipeline, name, environments, pipelines_dir,
     #
     # If an environment is allowed, it will be reduced to it
     # 
+    #print(environment)
+    #print(allowed_environments)
     if environment not in allowed_environments:
-      print(Text.yellow(f"Warning - environment {environment} does not exist within the {target_environments_dir} directory and will be ignored."))
-    else:
-      explicit_environments.append(environment)
+      print(Text.yellow(f"Warning - Environment {environment} is not allowed for {pipelines_dir}/{name}.py and will be ignored."))
+    
+    explicit_environments.append(environment)
 
 
   negated_environments += ignore_environments
